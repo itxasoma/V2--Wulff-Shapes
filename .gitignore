@@ -1,0 +1,11 @@
+# Fortran module files
+*.mod
+*.smo
+*.o
+*.x
+
+# Report's pdf
+Practical_B3_May2025.pdf
+
+#Virtual environment
+.venv/
