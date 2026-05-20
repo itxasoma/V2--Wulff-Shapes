@@ -91,10 +91,11 @@ def plot_surface_energies(data, metals, surfaces):
         grelax = [data[metal][s][1] for s in surfaces]
         off    = offsets[metal]
 
+        # Use r'' raw strings so \g is not treated as an escape sequence
         ax.bar(x + off - width / 2, gfix,   width, color=colors[metal]['fix'],
-               label=rf'{metal} $\gamma_{{\rm fix}}$',   edgecolor='white', linewidth=0.5)
+               label=r'%s $\gamma_{\rm fix}$' % metal,   edgecolor='white', linewidth=0.5)
         ax.bar(x + off + width / 2, grelax, width, color=colors[metal]['relax'],
-               label=rf'{metal} $\gamma_{{\rm relax}}$', edgecolor='white', linewidth=0.5)
+               label=r'%s $\gamma_{\rm relax}$' % metal, edgecolor='white', linewidth=0.5)
 
     ax.set_xticks(x)
     ax.set_xticklabels(surf_labels, fontsize=12)
