@@ -19,8 +19,8 @@
 # ===========================================================================
 
 PYTHON   = python3
-SCRIPT   = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))src/wulff_surface_energies.py
-PLOTS    = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))src/plots.py
+SCRIPT   = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))wulff_surface_energies.py
+PLOTS    = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))plots.py
 ROOT     = .
 METALS   = Cu Pd
 SURFACES = 001 011 111
