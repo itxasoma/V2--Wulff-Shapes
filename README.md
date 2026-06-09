@@ -1,27 +1,32 @@
-# G1--Elasticity-of-a-gold-nanowire
+# V2--Wulff-Shapes
 
-Molecular dynamics simulation of tensile deformation of an Au nanowire oriented along [110], using LAMMPS with an EAM force field. Analysis includes stress-strain curves, Young's modulus, and coordination-number-based defect tracking.
+DFT-PBE surface energy calculations for the three low-index facets of Cu and Pd,
+followed by the Wulff construction to obtain the equilibrium nanoparticle shape.
 
 ## Repo structure
 
 ```
-├── MNS/
-│   └── nanowire/
-│       ├── in.nano                        ← LAMMPS input script
-│       ├── Au_u3.eam                      ← EAM force field (Foiles et al., PRB 33, 7983, 1986)
-│       └── lammps-210912-smp-iqtc05.sub  ← SGE job submission script
+├── Wulff-Data/
+│   ├── Cu/
+│   │   ├── Bulk/    OUTCAR + POSCAR for the fcc bulk unit cell
+│   │   ├── 001/     OUTCAR + CONTCAR for the relaxed slab
+│   │   ├── 011/
+│   │   └── 111/
+│   └── Pd/
+│       ├── Bulk/
+│       ├── 001/
+│       ├── 011/
+│       └── 111/
 ├── src/
-│   ├── plots.py                           ← Stress-strain and Epot plots
-│   ├── defects.py                         ← Coordination number and defect analysis
+│   ├── wulff_surface_energies.py  reads VASP output, writes CSV
+│   ├── plots.py                   reads CSV, writes PDF figures
 │   ├── Makefile
 │   └── lib/
 │       ├── science.mplstyle
 │       └── requirements.txt
-├── figures/                               ← Output PDFs (stress-strain, Epot)
-└── defects/                               ← Output PDFs and CN table (CSV)
+├── figures/                       output PDFs
+└── surface_energies_all.csv       computed surface energies
 ```
-
-> **Note:** Large simulation outputs (`Au_tension.xyz`, `pos.dump`, `log.lammps`, ~900 MB) are not tracked by git. They are produced by running the simulation as described below.
 
 ## Virtual environment
 
@@ -30,29 +35,27 @@ python3 -m venv .venv && source .venv/bin/activate
 pip install -r src/lib/requirements.txt
 ```
 
-## Running the simulation
-
-The simulation runs on a cluster via SGE. Copy the input files and submit:
-
-```bash
-# On the cluster
-cd $HOME/MNS/nanowire/
-qsub lammps-210912-smp-iqtc05.sub
-```
-
-Output files will be written to `$HOME/MNS/nanowire/nanowire/$JOB_ID/`:
-- `log.lammps` — thermodynamic data (step, T, Epot, Lz, Vol, Pzz)
-- `Au_tension.xyz` — atomic positions at every 200 steps
-- `pos.dump` — LAMMPS dump during thermalisation
-
-Wall clock time: ~2 days (1 core).
-
-## Analysis
+## Running the analysis
 
 ```bash
 cd src/
-make figs      # stress-strain and Epot plots → figures/
-make defects   # coordination number and defect analysis → defects/
+make        # compute energies + generate all figures
+make figs   # regenerate figures from existing CSV
+make run    # force re-run (ignore existing CSV)
+make clean  # remove CSV and PDF outputs
 ```
 
-Breaking point identified visually in VMD at **frame 328 / 2000** (~65.6% strain).
+Figures are saved in `figures/`:
+- `surface_energies_bar.pdf`   — fixed vs. relaxed $\gamma$ for all facets
+- `relaxation_energy_bar.pdf`  — $\Delta\gamma$ per facet
+- `wulff_h_values.pdf`         — normalised Wulff h-values
+
+## Results summary
+
+| Metal | $\gamma_{111}$ (J m⁻²) | $\gamma_{001}$ (J m⁻²) | $\gamma_{011}$ (J m⁻²) |
+|-------|--------------|--------------|--------------|
+| Cu    | 1.3313       | 1.5102       | 1.5421       |
+| Pd    | 1.1352       | 1.5022       | 1.5406       |
+
+Stability order: $\gamma_{111}$ < $\gamma_{001}$ < $\gamma_{011}$ for both metals.
+Wulff shapes: truncated octahedron (Cu) and near-perfect octahedron (Pd).
